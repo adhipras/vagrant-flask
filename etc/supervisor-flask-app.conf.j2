@@ -1,0 +1,12 @@
+[program:flask-app]
+directory=/home/{{ os_generic_user }}/app
+command=/home/{{ os_generic_user }}/app/app.py
+user={{ os_generic_user }}
+numprocs=1
+stderr_logfile=/home/{{ os_generic_user }}/app/app.stderr.log
+stdout_logfile=/home/{{ os_generic_user }}/app/app.stdout.log
+autostart=true
+autorestart=true
+stopsignal=INT
+stopasgroup=true
+killasgroup=true
