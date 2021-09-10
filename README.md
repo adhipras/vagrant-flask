@@ -1,6 +1,6 @@
 # Vagrant + Flask
 
-A [Flask](https://flask.palletsprojects.com/) app running in a [Vagrant VM](https://www.vagrantup.com/). I choose [Ansible](https://www.ansible.com/) as [Vagrant provisioner](https://www.vagrantup.com/docs/provisioning/) to install and configure everything.
+A [Flask](https://flask.palletsprojects.com/) app running in a [Vagrant](https://www.vagrantup.com/) VM. I choose [Ansible](https://www.ansible.com/) as [Vagrant provisioner](https://www.vagrantup.com/docs/provisioning/ansible) to install and configure the VM.
 
 ## Usage
 
