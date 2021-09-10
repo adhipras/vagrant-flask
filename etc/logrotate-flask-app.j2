@@ -1,0 +1,8 @@
+/home/{{ os_generic_user }}/app/*.log {
+    daily
+    missingok
+    notifempty
+    compress
+    dateext
+    create 644 root root
+}
