@@ -1,0 +1,78 @@
+---
+- hosts: all
+  become: yes
+
+  vars:
+    os_generic_user: adhipras
+
+  tasks:
+  - name: Configuring time zone
+    timezone:
+      name: Etc/UTC
+  - name: Installing requirements
+    apt:
+      name:
+        - acl
+        - git
+        - nginx
+        - python-is-python3
+        - python3-pip
+        - supervisor
+      state: latest
+      update_cache: yes
+  - name: Creating user
+    user:
+      name: "{{ os_generic_user }}"
+      shell: /bin/bash
+  - name: Copying Flask app directory
+    copy:
+      src: "{{ playbook_dir }}/app"
+      dest: "/home/{{ os_generic_user }}"
+      owner: "{{ os_generic_user }}"
+      group: "{{ os_generic_user }}"
+  - name: Changing Flask app file permissions
+    file:
+      path: "/home/{{ os_generic_user }}/app/app.py"
+      state: file
+      mode: 0755
+  - name: Upgrading Python PIP
+    become_user: "{{ os_generic_user }}"
+    pip:
+      name: pip
+      extra_args: --user --upgrade
+  - name: Installing Python dependencies
+    become_user: "{{ os_generic_user }}"
+    pip:
+      requirements: "/home/{{ os_generic_user }}/app/requirements.txt"
+      extra_args: --user
+  - name: Copying supervisor configuration file
+    template:
+      src: "{{ playbook_dir }}/etc/supervisor-flask-app.conf.j2"
+      dest: /etc/supervisor/conf.d/flask-app.conf
+  - name: Restarting supervisor service
+    service:
+      name: supervisor
+      state: restarted
+      enabled: yes
+  - name: Removing NGINX default configuration file
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+  - name: Copying NGINX configuration file
+    copy:
+      src: "{{ playbook_dir }}/etc/nginx-flask-app.conf"
+      dest: /etc/nginx/sites-available/flask-app.conf
+  - name: Creating symbolic link for NGINX configuration file
+    file:
+      src: /etc/nginx/sites-available/flask-app.conf
+      dest: /etc/nginx/sites-enabled/flask-app.conf
+      state: link
+  - name: Restarting NGINX service
+    service:
+      name: nginx
+      state: restarted
+      enabled: yes
+  - name: Copying logrotate configuration file
+    template:
+      src: "{{ playbook_dir }}/etc/logrotate-flask-app.j2"
+      dest: /etc/logrotate.d/flask-app
